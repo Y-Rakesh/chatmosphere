@@ -105,5 +105,5 @@ connectSocket: () => {
 ,
   disconnectSocket: () => {
     if (get().socket?.connected) get().socket.disconnect();
-  },
+  }
 }));
