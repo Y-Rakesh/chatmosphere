@@ -83,23 +83,26 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
-  connectSocket: () => {
-    const { authUser } = get();
-    if (!authUser || get().socket?.connected) return;
+connectSocket: () => {
+  const { authUser } = get();
+  if (!authUser || get().socket?.connected) return;
 
-    const socket = io(BASE_URL, {
-      query: {
-        userId: authUser._id,
-      },
-    });
-    socket.connect();
+  const socket = io(BASE_URL, {
+    query: {
+      userId: authUser._id,
+    },
+    withCredentials: true,   // 🔑 ensures cookies/session are shared
+    transports: ["websocket"], // 🔑 avoids polling issues on Vercel/Render
+  });
 
-    set({ socket: socket });
+  socket.connect();
+  set({ socket });
 
-    socket.on("getOnlineUsers", (userIds) => {
-      set({ onlineUsers: userIds });
-    });
-  },
+  socket.on("getOnlineUsers", (userIds) => {
+    set({ onlineUsers: userIds });
+  });
+},
+,
   disconnectSocket: () => {
     if (get().socket?.connected) get().socket.disconnect();
   },
